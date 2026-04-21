@@ -1,0 +1,10 @@
+# File explorer meta data for mac/windows/linux
+.DS_Store
+Thumbs.db
+
+# Julia and data files
+*.jls
+*.csv
+*.data
+*.log
+dev/runfile_support/

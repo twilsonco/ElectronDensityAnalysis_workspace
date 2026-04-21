@@ -1,0 +1,35 @@
+# Test toml file for Electron Density Analysis runfile support configuration
+
+# print_system_info_only = true
+
+[input]
+input = "/Users/haiiro/scratch/BH3-NH3_PES-scan.results/SPs/H3N-BH3_PBE-D3_TZP_AE_LT_C3v_00010.t41"
+# input = "/Users/haiiro/scratch/C4H8Na2.results/C4H8Na2.t41"
+type = "Tape41_ADF"
+
+[gbd]
+atom_indices = [1,2]
+pointwise_num_points = 150
+
+[plot]
+condensed_variables = [1]
+
+[plot.isosurf]
+min_value = 199
+max_value = 200
+grid_num_points = 4
+
+[plot.condensed_basins]
+type = "both"                # "maximum" | "minimum" | "both"
+show_all_gradient_paths = false
+
+[critical_points]
+search_grid_spacing = 0.4 
+
+[checkpoints]
+# use_condensed_basins_checkpoints = false
+# use_gbd_checkpoints = false
+
+# [tecplot_output]
+
+# [csv_output]
