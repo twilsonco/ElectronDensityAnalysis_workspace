@@ -3,15 +3,17 @@
 # print_system_info_only = true
 
 [input]
-input = "/Users/haiiro/scratch/BH3-NH3_PES-scan.results/SPs/H3N-BH3_PBE-D3_TZP_AE_LT_C3v_00010.t41"
+# input = "/Users/haiiro/scratch/BH3-NH3_PES-scan.results/SPs/H3N-BH3_PBE-D3_TZP_AE_LT_C3v_00010.t41"
+input = "/Users/haiiro/scratch/ethene_PBE_TZP_SP.results/ethene_PBE_TZP_SP.t41"
 # input = "/Users/haiiro/scratch/C4H8Na2.results/C4H8Na2.t41"
 type = "Tape41_ADF"
 
 [gbd]
-atom_indices = [1,2]
-pointwise_num_points = 150
+atom_indices = [1]
+pointwise_num_points = 50
 
 [plot]
+# enabled = false
 condensed_variables = [1]
 
 [plot.isosurf]
@@ -32,4 +34,5 @@ search_grid_spacing = 0.4
 
 # [tecplot_output]
 
-# [csv_output]
+[csv_output]
+enabled = false
