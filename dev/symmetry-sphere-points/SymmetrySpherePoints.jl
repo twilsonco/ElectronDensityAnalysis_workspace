@@ -21,6 +21,7 @@ using Combinatorics   # permutations
 export SymmetryGroup, OhSymmetry, TdSymmetry
 export wedge_vertices, group_order, symmetry_images
 export wedge_points, full_sphere_points
+export n_sphere_points, find_q
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Abstract interface
@@ -116,6 +117,71 @@ function full_sphere_points(g::SymmetryGroup, q::Int; interior_only::Bool = fals
 
     # deduplicate via rounding
     return unique(v -> round.(v; digits = 10), all_pts)
+end
+
+"""
+    n_sphere_points(g::SymmetryGroup, q::Int; interior_only=false) → Int
+
+Return the number of unique full-sphere points for grid level `q` without
+materializing the point arrays.  Useful for searching over `q`.
+"""
+function n_sphere_points(g::SymmetryGroup, q::Int; interior_only::Bool = false)
+    return length(full_sphere_points(g, q; interior_only))
+end
+
+"""
+    find_q(g::SymmetryGroup, n_target::Int; interior_only=false) → (q, n_actual)
+
+Find the grid level `q` whose full-sphere expansion is closest to `n_target`
+points.  Returns `(q, n_actual)` where `n_actual` is the true point count
+(which may differ from `n_target` due to the discrete grid and merging of
+boundary points).
+
+When two values of `q` are equidistant from `n_target`, the larger one
+(more points) is chosen.
+"""
+function find_q(g::SymmetryGroup, n_target::Int; interior_only::Bool = false)
+    n_target > 0 || throw(ArgumentError("n_target must be positive"))
+
+    best_q = 1
+    best_n = n_sphere_points(g, 1; interior_only)
+
+    for q in 2:10_000
+        n = n_sphere_points(g, q; interior_only)
+        if abs(n - n_target) <= abs(best_n - n_target)
+            best_q, best_n = q, n
+        end
+        # once we've overshot by more than the current best error, stop
+        if n > n_target && (n - n_target) > abs(best_n - n_target)
+            break
+        end
+    end
+
+    return (q = best_q, n = best_n)
+end
+
+"""
+    full_sphere_points(g::SymmetryGroup; n_target, interior_only=false)
+
+Convenience method: find the best `q` for `n_target` total points, then
+return `(points, q, n_actual)`.
+"""
+function full_sphere_points(g::SymmetryGroup; n_target::Int, interior_only::Bool = false)
+    q, n = find_q(g, n_target; interior_only)
+    pts  = full_sphere_points(g, q; interior_only)
+    return (points = pts, q = q, n = length(pts))
+end
+
+"""
+    wedge_points(g::SymmetryGroup; n_target, interior_only=false)
+
+Convenience method: find the best `q` for `n_target` total *full-sphere*
+points, then return wedge points and metadata.
+"""
+function wedge_points(g::SymmetryGroup; n_target::Int, interior_only::Bool = false)
+    q, n = find_q(g, n_target; interior_only)
+    pts  = wedge_points(g, q; interior_only)
+    return (points = pts, q = q, n_sphere = n)
 end
 
 # ═══════════════════════════════════════════════════════════════════════════════

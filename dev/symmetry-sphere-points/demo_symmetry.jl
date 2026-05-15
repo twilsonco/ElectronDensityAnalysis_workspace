@@ -83,26 +83,31 @@ function plot_full_sphere(g::SymmetryGroup, full_pts)
 end
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Run for both groups
+# Run for both groups — specify desired total sphere points
 # ═══════════════════════════════════════════════════════════════════════════════
 
-q = 16
+n_target = 5000   # desired total points on the full sphere
 
 for g in (OhSymmetry(), TdSymmetry())
     gname = nameof(typeof(g))
     println("\n── $gname  (order $(group_order(g))) ──")
 
-    wpts = wedge_points(g, q)
-    fpts = full_sphere_points(g, q)
+    # find_q picks the q whose full-sphere count is closest to n_target
+    q_found, n_actual = find_q(g, n_target)
+    println("  Requested ≈ $n_target pts → q = $q_found  ($n_actual actual pts)")
+
+    # n_target convenience overload (returns a NamedTuple)
+    result = full_sphere_points(g; n_target)
+    println("  Full-sphere points:      $(result.n)  (q=$(result.q))")
+
+    # you can still use an explicit q if you prefer
+    wpts = wedge_points(g, q_found)
     println("  Wedge points (all):      $(length(wpts))")
-    println("  Full-sphere points:      $(length(fpts))")
 
-    wpts_int = wedge_points(g, q; interior_only = true)
-    fpts_int = full_sphere_points(g, q; interior_only = true)
-    println("  Wedge points (interior): $(length(wpts_int))")
-    println("  Full-sphere (interior):  $(length(fpts_int))")
+    # interior-only variant
+    q_int, n_int = find_q(g, n_target; interior_only = true)
+    println("  Interior: q = $q_int  ($n_int full-sphere pts)")
 
-    display(plot_wedge_on_sphere(g, q))
-    display(plot_wedge_on_sphere(g, q; interior_only = true))
-    display(plot_full_sphere(g, fpts))
+    display(plot_wedge_on_sphere(g, q_found))
+    display(plot_full_sphere(g, result.points))
 end
